@@ -1,6 +1,11 @@
 import app
 import unittest
 import hues
+import requests
+
+from config import config
+
+FLASK_APP_HOST = 'http://localhost:%s' % config['PORT']
 
 
 class EndpointsTests(unittest.TestCase):
@@ -13,7 +18,11 @@ class EndpointsTests(unittest.TestCase):
         assert (self.app.get('/').status_code == 404)
 
     def test_video_info_endpoint(self):
-        resp = self.app.post('/api/video/info', data=dict())
+        # resp = self.app.post('/api/video/info',
+        #                      data=dict(video_url='https://www.youtube.com/watch?v=jLbFHFsFCVQ'), )
+        resp = requests.post(FLASK_APP_HOST + '/api/video/info', json={
+            'video_url': 'https://www.youtube.com/watch?v=jLbFHFsFCVQ'
+        })
         hues.log(resp)
         assert resp.status_code == 200
 

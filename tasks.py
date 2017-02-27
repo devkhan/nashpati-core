@@ -14,6 +14,6 @@ def get_video_info(url):
 
     ytdl = YoutubeDL()
     ytdl.add_default_info_extractors()
-    info = ytdl.extract_info(url)
+    info = ytdl.extract_info(url, download=False)
     hues.info('URL: ', url)
     hues.info('Video info: ', info)
