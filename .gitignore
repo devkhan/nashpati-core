@@ -163,3 +163,5 @@ ENV/
 .ropeproject
 .gitignore
 .idea/
+
+*.db
