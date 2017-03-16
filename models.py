@@ -20,7 +20,7 @@ class Provider(db_wrapper.Model):
         pass
 
 
-class VideoRequest(db_wrapper.Model):
+class VideoInfo(db_wrapper.Model):
     video_id = CharField(max_length=100)
     provider = ForeignKeyField(rel_model=Provider)
     title = TextField(null=True)

@@ -1,0 +1,11 @@
+---
+- config:
+  - testset: "Meta Endpoints Tests"
+
+- test:
+  - name: "Check version"
+  - url: "/api/version"
+  - method: "GET"
+  - expected_status: [200]
+  - headers: {'Content-Type': 'application/json'}
+  - compare: {header: 'content-type', expected: 'application/json'}
