@@ -27,7 +27,7 @@ def get_video_info():
 
 @api.before_request
 def ensures_content_type():
-    if request.content_type != 'application/json':
+    if request.method != 'GET' and request.content_type != 'application/json':
         return jsonify({
             'message': 'Content-Type must be application/json'
         }), 415
@@ -35,6 +35,14 @@ def ensures_content_type():
 
 @api.route('/video/', methods=['POST'])
 def submit_new_video_info():
+    req = request.json
+    if 'video_id' not in req and 'video_web_url' not in req:
+        return jsonify({
+            'status': 'error',
+            'message': 'Either `video_id` or `video_web_url` must be provided.',
+        }), 400
+    # TODO: Add VideoInfo object in database, and start a task with that id.
+    # celery_tasks.get_video_info.delay(args)
     return ''
 
 

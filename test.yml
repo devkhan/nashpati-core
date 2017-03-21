@@ -9,3 +9,13 @@
   - expected_status: [200]
   - headers: {'Content-Type': 'application/json'}
   - compare: {header: 'content-type', expected: 'application/json'}
+  - validators:
+    - compare: {jsonpath_mini: 'version', comparator: 'eq', expected: '0.1.0'}
+
+- test:
+  - name: "Post new video info"
+  - url: "/api/video"
+  - mthod: "POST"
+  - expected_status: [201]
+  - headers: {'Content-Type': 'application/json'}
+  - compare: {header: 'location', expected: '*/api/video/*'}
