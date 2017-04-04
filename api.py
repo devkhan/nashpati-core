@@ -2,10 +2,10 @@ from flask import Blueprint, jsonify, request
 from playhouse.flask_utils import get_object_or_404
 from models import DatabaseWrapper
 from utils import return_json
+from models import VideoInfo, Video, Provider
 
 import hues
 import celery_tasks
-import models
 
 
 api = Blueprint('api', __name__)
@@ -41,6 +41,10 @@ def submit_new_video_info():
             'status': 'error',
             'message': 'Either `video_id` or `video_web_url` must be provided.',
         }), 400
+    v_info = VideoInfo()
+    v_info.video_id = req.get('video_id', None)
+    v_info.webpage_url = req.get('video_web_url', None)
+    v_info.save()
     # TODO: Add VideoInfo object in database, and start a task with that id.
     # celery_tasks.get_video_info.delay(args)
     return ''

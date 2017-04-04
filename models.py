@@ -1,3 +1,5 @@
+import time
+
 from playhouse.flask_utils import FlaskDB
 from peewee import *
 
@@ -12,6 +14,18 @@ class DatabaseWrapper(object):
 db_wrapper = DatabaseWrapper().get_db_wrapper
 
 
+class VideoInfoStatus:
+    PENDING = 1
+    RUNNING = 2
+    SUCCEEDED = 3
+    FAILED = 4
+    CHOICES = [
+        (PENDING, 'pending'),
+        (RUNNING, 'running'),
+        (SUCCEEDED, 'succeeded'),
+        (FAILED, 'failed'),
+    ]
+
 class Provider(db_wrapper.Model):
     name = CharField(primary_key=True, null=False, max_length=64)
     host = CharField(null=False, max_length=255)
@@ -24,9 +38,10 @@ class VideoInfo(db_wrapper.Model):
     video_id = CharField(max_length=100)
     provider = ForeignKeyField(rel_model=Provider)
     title = TextField(null=True)
-    timestamp = TimestampField(null=False)
+    timestamp = TimestampField(null=False, default=int(time.time()))
     webpage_url = CharField(max_length=255, null=True)
     ytdl_info = TextField(null=True)
+    status = IntegerField(choices=VideoInfoStatus.CHOICES, default=VideoInfoStatus.PENDING)
 
     class Meta:
         pass

@@ -14,7 +14,7 @@
 
 - test:
   - name: "Post new video info"
-  - url: "/api/video"
+  - url: "/api/video/"
   - mthod: "POST"
   - expected_status: [201]
   - headers: {'Content-Type': 'application/json'}
