@@ -36,18 +36,33 @@ def ensures_content_type():
 @api.route('/video/', methods=['POST'])
 def submit_new_video_info():
     req = request.json
-    if 'video_id' not in req and 'video_web_url' not in req:
-        return jsonify({
-            'status': 'error',
-            'message': 'Either `video_id` or `video_web_url` must be provided.',
-        }), 400
+    hues.info(req)
     v_info = VideoInfo()
-    v_info.video_id = req.get('video_id', None)
-    v_info.webpage_url = req.get('video_web_url', None)
-    v_info.save()
+    if 'video_id' not in req:
+        if 'video_web_url' not in req:
+            return jsonify({
+                'status': 'errored',
+                'message': 'Either `video_id` or `video_web_url` must be provided.',
+            }), 400
+        else:
+            v_info.webpage_url = req['video_web_url']
+    elif 'provider' not in req:
+        return jsonify({
+                'status': 'errored',
+                'message': '`provider` must be given with `video_id`.',
+            }), 400
+    else:
+        v_info.video_id = req['video_id']
+        v_info.provider = req['provider']
+    if v_info.save():
+        return jsonify(v_info), 201
+    else:
+        return jsonify({
+            'status': 'errored',
+            'message': 'Couldn\'t save `VideoInfo` object.',
+        })
     # TODO: Add VideoInfo object in database, and start a task with that id.
     # celery_tasks.get_video_info.delay(args)
-    return ''
 
 
 @api.route('/version', methods=['GET'])

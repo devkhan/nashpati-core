@@ -15,7 +15,8 @@
 - test:
   - name: "Post new video info"
   - url: "/api/video/"
-  - mthod: "POST"
+  - method: "POST"
+  - body: '{ "video_web_url": "https://www.youtube.com/watch?v=7z1rf2kzEkc" }'
   - expected_status: [201]
   - headers: {'Content-Type': 'application/json'}
   - compare: {header: 'location', expected: '*/api/video/*'}
