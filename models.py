@@ -1,7 +1,9 @@
 import time
+import hues
 
 from playhouse.flask_utils import FlaskDB
 from peewee import *
+from json import JSONEncoder
 
 
 class DatabaseWrapper(object):
@@ -29,15 +31,22 @@ class VideoInfoStatus:
     ]
 
 
-class Provider(db_wrapper.Model):
+class Provider(db_wrapper.Model, JSONEncoder):
     name = CharField(primary_key=True, null=False, max_length=64)
     host = CharField(null=False, max_length=255)
+
+    def default(self, o):
+        return {
+            'id': o.id,
+            'name': o.name,
+            'host': o.host,
+        }
 
     class Meta:
         pass
 
 
-class VideoInfo(db_wrapper.Model):
+class VideoInfo(db_wrapper.Model, JSONEncoder):
     video_id = CharField(max_length=100, null=True)
     provider = ForeignKeyField(rel_model=Provider, null=True)
     title = TextField(null=True)
@@ -45,6 +54,14 @@ class VideoInfo(db_wrapper.Model):
     webpage_url = CharField(max_length=255, null=True)
     ytdl_info = TextField(null=True)
     status = IntegerField(choices=VideoInfoStatus.CHOICES, default=VideoInfoStatus.PENDING)
+
+    def serialize(self):
+        hues.info('VideoInfo.serialize()')
+        return {
+            'status': self.status,
+            'timestamp': self.timestamp,
+            'id': self.id,
+        }
 
     class Meta:
         pass

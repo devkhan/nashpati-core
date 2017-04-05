@@ -55,12 +55,12 @@ def submit_new_video_info():
         v_info.video_id = req['video_id']
         v_info.provider = req['provider']
     if v_info.save():
-        return jsonify(v_info), 201
+        return jsonify(v_info.serialize()), 201
     else:
         return jsonify({
             'status': 'errored',
             'message': 'Couldn\'t save `VideoInfo` object.',
-        })
+        }), 500
     # TODO: Add VideoInfo object in database, and start a task with that id.
     # celery_tasks.get_video_info.delay(args)
 
