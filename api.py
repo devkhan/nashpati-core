@@ -1,8 +1,7 @@
-from flask import Blueprint, jsonify, request
-from playhouse.flask_utils import get_object_or_404
+from flask import Blueprint, jsonify, request, current_app
 from models import DatabaseWrapper
 from utils import return_json
-from models import VideoInfo, Video, Provider
+from models import VideoInfo
 
 import hues
 import celery_tasks
@@ -18,7 +17,7 @@ def get_video_info():
     body = request.json
     hues.log(body)
     # A pointless end-point for testing purposes.
-    celery_tasks.get_video_info.delay(body['video_url'])
+    # celery_tasks.get_video_info.delay(body['video_url'])
     return jsonify({
         'status': 'running',
         'message': 'video submitted successfully'
@@ -38,31 +37,21 @@ def submit_new_video_info():
     req = request.json
     hues.info(req)
     v_info = VideoInfo()
-    if 'video_id' not in req:
-        if 'video_web_url' not in req:
-            return jsonify({
-                'status': 'errored',
-                'message': 'Either `video_id` or `video_web_url` must be provided.',
-            }), 400
-        else:
-            v_info.webpage_url = req['video_web_url']
-    elif 'provider' not in req:
+    if 'url' not in req:
         return jsonify({
-                'status': 'errored',
-                'message': '`provider` must be given with `video_id`.',
-            }), 400
+            'status': 'errored',
+            'message': '`url` must be provided.',
+        }), 400
     else:
-        v_info.video_id = req['video_id']
-        v_info.provider = req['provider']
+        v_info.url = req['url']
     if v_info.save():
+        celery_tasks.get_video_info.delay(id=v_info.get_id())
         return jsonify(v_info.serialize()), 201
     else:
         return jsonify({
             'status': 'errored',
-            'message': 'Couldn\'t save `VideoInfo` object.',
+            'message': 'Couldn\'t process video URL.',
         }), 500
-    # TODO: Add VideoInfo object in database, and start a task with that id.
-    # celery_tasks.get_video_info.delay(args)
 
 
 @api.route('/version', methods=['GET'])

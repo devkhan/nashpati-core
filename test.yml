@@ -16,13 +16,13 @@
   - name: "Post new video info"
   - url: "/api/video/"
   - method: "POST"
-  - body: '{ "video_web_url": "https://www.youtube.com/watch?v=7z1rf2kzEkc" }'
+  - body: '{ "url": "https://www.youtube.com/watch?v=7z1rf2kzEkc" }'
   - expected_status: [201]
   - headers: {'Content-Type': 'application/json'}
   - compare: {header: 'location', expected: '*/api/video/*'}
 
 - test:
-  - name: "Fails without `video_id` or `web_url`."
+  - name: "Fails without `url`."
   - url: "/api/video/"
   - method: "POST"
   - body: '{  }'

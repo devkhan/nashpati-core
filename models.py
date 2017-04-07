@@ -1,3 +1,4 @@
+import json
 import time
 import hues
 
@@ -31,37 +32,24 @@ class VideoInfoStatus:
     ]
 
 
-class Provider(db_wrapper.Model, JSONEncoder):
-    name = CharField(primary_key=True, null=False, max_length=64)
-    host = CharField(null=False, max_length=255)
-
-    def default(self, o):
-        return {
-            'id': o.id,
-            'name': o.name,
-            'host': o.host,
-        }
-
-    class Meta:
-        pass
-
-
 class VideoInfo(db_wrapper.Model, JSONEncoder):
-    video_id = CharField(max_length=100, null=True)
-    provider = ForeignKeyField(rel_model=Provider, null=True)
-    title = TextField(null=True)
     timestamp = TimestampField(null=False, default=int(time.time()))
-    webpage_url = CharField(max_length=255, null=True)
+    url = CharField(max_length=255, null=True)
     ytdl_info = TextField(null=True)
     status = IntegerField(choices=VideoInfoStatus.CHOICES, default=VideoInfoStatus.PENDING)
 
     def serialize(self):
         hues.info('VideoInfo.serialize()')
         return {
+            'id': self.get_id(),
+            'video_url': self.url,
             'status': self.status,
             'timestamp': self.timestamp,
-            'id': self.id,
         }
+
+    @property
+    def info(self):
+        return json.loads(self.ytdl_info)
 
     class Meta:
         pass

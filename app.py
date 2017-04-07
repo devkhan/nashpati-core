@@ -18,5 +18,8 @@ app.debug = True
 app.register_blueprint(api, url_prefix='/api')
 
 
+def get_app():
+    return app
+
 if __name__ == '__main__':
     app.run(debug=True, port=config['PORT'])
