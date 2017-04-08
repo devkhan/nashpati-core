@@ -9,5 +9,3 @@ config = {
     'APP_NAME': 'nashpati',
     'PORT': 4444
 }
-
-hues.info(config)

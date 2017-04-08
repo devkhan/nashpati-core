@@ -33,15 +33,7 @@ celery = make_celery()
 
 @celery.task(bind=True)
 def get_video_info(self, id):
-    database = SqliteDatabase(config['DATABASE_URL'].replace('sqlite:///', ''))
-    try:
-        database.connect()
-        vi_obj = VideoInfo.get(VideoInfo.id == id)
-    except:
-        hues.info('Can\'t connect to database.')
-        return
-    finally:
-        database.close()
+    vi_obj = VideoInfo.get(VideoInfo.id == id)
     ytdl = YoutubeDL()
     ytdl.add_default_info_extractors()
     vi_obj.status = VideoInfoStatus.RUNNING

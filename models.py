@@ -40,12 +40,17 @@ class VideoInfo(db_wrapper.Model, JSONEncoder):
 
     def serialize(self):
         hues.info('VideoInfo.serialize()')
-        return {
+        serialized = {
             'id': self.get_id(),
             'video_url': self.url,
             'status': self.status,
             'timestamp': self.timestamp,
         }
+        if self.ytdl_info:
+            serialized.update({
+                'info': json.loads(self.ytdl_info)
+            })
+        return serialized
 
     @property
     def info(self):

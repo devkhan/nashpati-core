@@ -10,8 +10,6 @@ app.config['CELERY_RESULT_BACKEND'] = config['CELERY_RESULT_BACKEND']
 app.config['DATABASE'] = config['DATABASE_URL']
 db_wrapper = DatabaseWrapper().get_db_wrapper
 db_wrapper.init_app(app)
-# db_wrapper.database.init(app.config['DATABASE'])
-# db_wrapper.database.connect()
 db_wrapper.database.create_tables([VideoInfo], safe=True)
 db_wrapper.database.close()
 app.debug = True

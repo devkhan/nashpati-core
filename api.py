@@ -1,4 +1,6 @@
 from flask import Blueprint, jsonify, request, current_app
+from playhouse.flask_utils import get_object_or_404
+
 from models import DatabaseWrapper
 from utils import return_json
 from models import VideoInfo
@@ -9,19 +11,6 @@ import celery_tasks
 
 api = Blueprint('api', __name__)
 db = DatabaseWrapper().get_db_wrapper.database
-
-
-# NOTE: This is here for historical reasons, I'll remove it in the future.
-@api.route('/video/info', methods=['POST'])
-def get_video_info():
-    body = request.json
-    hues.log(body)
-    # A pointless end-point for testing purposes.
-    # celery_tasks.get_video_info.delay(body['video_url'])
-    return jsonify({
-        'status': 'running',
-        'message': 'video submitted successfully'
-    })
 
 
 @api.before_request
@@ -52,6 +41,14 @@ def submit_new_video_info():
             'status': 'errored',
             'message': 'Couldn\'t process video URL.',
         }), 500
+
+
+@api.route('/video/<id>', methods=['GET'])
+def get_video_info(id):
+    vi = get_object_or_404(VideoInfo.select(), (VideoInfo.id == id))
+    if vi:
+        return jsonify(vi.serialize()), 200
+    return 404
 
 
 @api.route('/version', methods=['GET'])
