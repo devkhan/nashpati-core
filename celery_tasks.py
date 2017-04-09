@@ -1,15 +1,13 @@
 import json
 
-import hues
 from celery import Celery
 from flask import Flask
-from peewee import SqliteDatabase
 from youtube_dl import YoutubeDL, DownloadError
 from youtube_dl.utils import ExtractorError
 
+import app
 from config import config
 from models import VideoInfo, VideoInfoStatus
-import app
 
 
 def make_celery():
