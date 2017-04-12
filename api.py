@@ -1,7 +1,7 @@
 from flask import Blueprint, jsonify, request, current_app
 from playhouse.flask_utils import get_object_or_404
 
-from models import DatabaseWrapper
+from models import DatabaseWrapper, Video
 from utils import return_json
 from models import VideoInfo
 
@@ -49,6 +49,19 @@ def get_video_info(id):
     if vi:
         return jsonify(vi.serialize()), 200
     return 404
+
+
+@api.route('/video/<video_id>/formats/<format_id>', methods=['POST'])
+def trigger_video_download(video_id, format_id):
+    vi = get_object_or_404(Video.select().where(Video.video_id == video_id), (Video.format_id == format_id))
+    celery_tasks.download_video.delay(id=video_id, format_id=format_id)
+    return jsonify(vi.serialize()), 201
+
+
+@api.route('/video/<video_id>/formats/<format_id>', methods=['GET'])
+def get_video_download(video_id, format_id):
+    vi = get_object_or_404(Video.select().where(Video.video_id == video_id), (Video.format_id == format_id))
+    return jsonify(vi.serialize()), 200
 
 
 @api.route('/version', methods=['GET'])

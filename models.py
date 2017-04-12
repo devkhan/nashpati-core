@@ -72,7 +72,7 @@ class VideoInfo(db_wrapper.Model, JSONEncoder):
         if 'formats' not in info:
             video = Video()
             video.video_url = info['url']
-            video.format = info['format']
+            video.format_id = info['format']
             video.video = self.get_id()
             video.save()
             return
@@ -80,7 +80,7 @@ class VideoInfo(db_wrapper.Model, JSONEncoder):
             video = Video()
             video.video = self.get_id()
             video.video_url = f['url']
-            video.format = f['format'] if 'format' in f else ''
+            video.format_id = f['format_id'] if 'format_id' in f else ''
             video.total_bytes = f['filesize'] if 'filesize' in f else None
             video._extra = json.dumps(f)
             video.save()
@@ -96,7 +96,7 @@ class VideoInfo(db_wrapper.Model, JSONEncoder):
 
 class Video(db_wrapper.Model):
     video = ForeignKeyField(VideoInfo, related_name='videos')
-    format = CharField(max_length=50)
+    format_id = CharField(max_length=50)
     video_url = CharField(max_length=255, null=False)
     downloaded_bytes = IntegerField(null=False, default=0)
     total_bytes = IntegerField(null=True)
@@ -104,15 +104,14 @@ class Video(db_wrapper.Model):
     location = CharField(max_length=255, null=True)
     _extra = TextField(null=True)
 
-    def serialized(self):
+    def serialize(self):
         serialized = {
-            'format': self.format,
-            'video_url': self.url,
+            'format_id': self.format_id,
+            'video_url': self.video_url,
             'downloaded_bytes': self.downloaded_bytes,
             'total_bytes': self.total_bytes,
             'status': self.status,
             'location': self.location,
-            'timestamp': self.timestamp,
         }
         if self.extra:
             serialized.update({
@@ -122,7 +121,7 @@ class Video(db_wrapper.Model):
 
     @property
     def extra(self):
-        return json.loads(self.extra)
+        return json.loads(self._extra)
 
     class Meta:
         pass
